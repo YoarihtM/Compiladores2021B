@@ -1,60 +1,191 @@
-class Transicion:
-    __nodoOrigen = 0
-    __nodoDestino = 1
-    __caracterTransicion = ''
+def inf2post(cadena):
+    operadores = []
+    cad_resultado = ''
     
-    def getOrigen(self):
-        return self.__nodoOrigen
-
-    def getDestino(self):
-        return self.__nodoDestino
+    for i in cadena:
+        # print('entrada ', i)
+        if i == '(':
+            operadores.append(i)
+            # print('pila ', operadores)
+            # print('resultado', cad_resultado)
+            
+        elif i == '*':
+            try:
+                # print('pila ', operadores)
+                indice = len(operadores) - 1
+                fin_oper = operadores[indice]
+                # print('ultimo elemento en la pila', fin_oper)
+                
+                if fin_oper == '*':
+                    fin_oper = operadores.pop()
+                    
+                    while fin_oper == '*':
+                        cad_resultado += fin_oper
+                        fin_oper = operadores.pop()
+                    
+                    operadores.append(i)
+                    # print('pila ', operadores)
+                    # print('resultado', cad_resultado)
+                    
+                else:
+                    operadores.append(i)
+                    # print('pila ', operadores)
+                    # print('resultado', cad_resultado)
+                    
+            except:
+                operadores.append(i)
+                # print('pila ', operadores)
+                # print('resultado', cad_resultado)
+                
+        elif i == '.' or i == '|':
+            
+            try:
+                
+                # print('pila ', operadores)
+                indice = len(operadores) - 1
+                fin_oper = operadores[indice]
+                # print('ultimo elemento en la pila', fin_oper)
+                
+                if fin_oper == '*' or fin_oper == '|' or fin_oper == '.':
+                    fin_oper = operadores.pop()
+                    
+                    while fin_oper == '*' or fin_oper == '|' or fin_oper == '.':
+                        cad_resultado += fin_oper
+                        fin_oper = operadores.pop()
+                        
+                    operadores.append(i)
+                    # print('pila ', operadores)
+                    # print('resultado', cad_resultado)
+                
+                else:
+                    operadores.append(i)
+                    # print('pila ', operadores)
+                    # print('resultado', cad_resultado)
+            
+            except:
+                operadores.append(i)
+                # print('pila ', operadores)
+                # print('resultado', cad_resultado)
+                
+        elif i == ')':
+            # print('pila ', operadores)
+            fin_oper = operadores.pop()
+            while fin_oper != '(':
+                # print('pila ', operadores)
+                cad_resultado += fin_oper
+                try:
+                    fin_oper = operadores.pop()
+                except:
+                    break
+            
+            # print('pila ', operadores)
+            # print('resultado', cad_resultado)
+            
+        else:
+            # print('pila ', operadores)
+            cad_resultado += i
+            # print('resultado', cad_resultado)
     
-    def getCaracter(self):
-        return self.__caracterTransicion
+        # print('\n------------------------------------------------------\n')
     
-    def setOrigen(self, origen):
-        self.__nodoOrigen = origen
+    if len(operadores) != 0:
+        # print('fin de la entrada con elementos en pila ', operadores)
+        
+        for operador in operadores:
+            cad_resultado += operador
+    #         print('resultado', cad_resultado)
+    #         print('')
+    # else:
+    #     print('fin de la entrada con pila vacía')
+    #     print('')
     
-    def setDestino(self, destino):
-        self.__nodoDestino = destino
+    return cad_resultado
+
+def concatenacion(simbolo1, simbolo2, estados):
+    ultimo_estado = estados[len(estados)-1]
+    print('ultimo estado: ', ultimo_estado)
+    ultimo_estado += 1
+    estados.append(ultimo_estado)
     
-    def setCaracter(self, caracter):
-        self.__caracterTransicion = caracter
-
-class TransicionEpsilon(Transicion):
-    def __init__(self, origen, destino):
-        self.setOrigen(origen)
-        self.setDestino(destino)
-        self.setCaracter('ε')
-
-    def getTransicion(self):
-        return self.getOrigen(), self.getDestino(), self.getCaracter()
-
-class TransicionSimple(Transicion):
-    def __init__(self, origen, destino, caracter):
-        self.setOrigen(origen)
-        self.setDestino(destino)
-        self.setCaracter(caracter)
+    resultado = str(ultimo_estado) + ' - (' + simbolo1 + ') -> '
+    ultimo_estado += 1
+    estados.append(ultimo_estado)
+    resultado += str(ultimo_estado) + ' - (' + simbolo2 + ') -> '
+    ultimo_estado += 1
+    estados.append(ultimo_estado)
+    resultado += str(ultimo_estado)
     
-    def getTransicion(self):
-        return self.getOrigen(), self.getDestino(), self.getCaracter()
+    return resultado, estados
 
-class TransicionEstrella(Transicion):
-    __destinoBucle = 0
-    __caracterSalida = 'ε'
-
-    def getSalida(self):
-        return self.__caracterSalida
+def eleccion(simbolo1, simbolo2, estados):
+    ultimo_estado = estados[len(estados)-1]
+    print('ultimo estado: ', ultimo_estado)
+    ultimo_estado += 1
+    estados.append(ultimo_estado)
     
-    def getDestinoBucle(self):
-        return self.__destinoBucle
-
-    def getTransicion(self):
-        return self.getOrigen(), self.getDestino(), self.getDestinoBucle(), self.getCaracter(), self.getSalida()
-
-    def setDestinoBucle(self):
-        self.__destinoBucle = self.getOrigen()
+    resultado = str(ultimo_estado) + ' - ε -> ' + str(ultimo_estado+1) + ' - (' + simbolo1 + ') -> ' + str(ultimo_estado+2) + ' - ε -> ' + str(ultimo_estado+5)
     
-    def setTransicion(self, origen, expresion):
-        self.setOrigen(origen)
+    resultado += '\n  \ \n   ε -> ' + str(ultimo_estado+3) + ' - (' + simbolo2 + ') -> ' + str(ultimo_estado+4) + ' - ε -> ' + str(ultimo_estado+5)
+    ultimo_estado += 1
+    estados.append(ultimo_estado)
+    ultimo_estado += 1
+    estados.append(ultimo_estado)
+    ultimo_estado += 1
+    estados.append(ultimo_estado)
+    ultimo_estado += 1
+    estados.append(ultimo_estado)
+    ultimo_estado += 1
+    estados.append(ultimo_estado)
+    
+    return resultado, estados
 
+def construirAutomata(cadena):
+    pila = []
+    estados = [0]
+    automata = ''
+    
+    for caracter in cadena:
+        if caracter == '*':
+            print('ciclo')
+        elif caracter == '|':
+            simb1 = pila.pop()
+            simb2 = pila.pop()
+            # print(f'eleccion entre: {simb2} y {simb1}')
+            elec, estados = eleccion(simb2, simb1, estados)
+            pila.append(elec)
+            # print()
+            # print(elec)
+            # print('pila ', pila)
+            # print('estados ', estados)
+        elif caracter == '.':
+            simb1 = pila.pop()
+            simb2 = pila.pop()
+            # print(f'concatenacion de: {simb2} con {simb1}')
+            concat, estados = concatenacion(simb2, simb1, estados)
+            pila.append(concat)
+            # print()
+            # print(concat)
+            # print('pila ', pila)
+            # print('estados ', estados)
+        else:
+            pila.append(caracter)
+            
+    resultado = pila.pop() 
+    
+    return resultado
+
+def main():
+    cadena = input('Ingresa la cadena a evaluar\n\t')
+    print('')
+    
+    postfija = inf2post(cadena)
+    print('cadena infija: ', cadena)
+    print('cadena postfija: ', postfija)
+    print()
+    automata = construirAutomata(postfija)
+    print(automata)
+    print()
+
+if __name__ == '__main__':
+    main()
+    
